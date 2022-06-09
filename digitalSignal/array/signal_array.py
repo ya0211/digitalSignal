@@ -1,26 +1,64 @@
-from .array_base import ArrayBase
+import numpy as np
+from .signal_index import SignalIndex
+from .signal_element import SignalElement
 
 
-class SignalArray(ArrayBase):
+class SignalArray:
     def __init__(self, *args):
-        super().__init__(*args)
+        index, element = list(), list()
+        if len(args) == 1:
+            if type(args[0]) is list:
+                index, element = args[0]
+            else:
+                raise TypeError(
+                    "unsupported operand type(s) :{0}".format(type(args[0])))
+        elif len(args) == 2:
+            index, element = args
+            if len(index) != len(element):
+                raise ValueError(
+                    "the length index is {0}, but element's is {1}".format(len(index), len(element)))
+        self.index = SignalIndex([int(i) for i in index])
+        self.element = SignalElement(element)
+        self._item_next = None
 
-    def _getitem(self, start, stop):
-        _element_item = list()
+    def __call__(self, *args):
+        self.__init__(*args)
+
+    def __len__(self):
+        return len(self.index)
+
+    def __str__(self):
+        return "darray({0}, {1})".format(self.index.range(), self.element)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        _self, _other = self.public(other)
+        eq = list()
+        for i in _self.index:
+            if _self[i] == _other[i]:
+                eq.append(True)
+            else:
+                eq.append(False)
+        return "darray({0}, {1})".format(_self.index, eq)
+
+    def _getitem_(self, start, stop):
+        element_item = list()
         for item in range(start, stop):
             if item in self.index:
-                _element_item.append(self.element[self.index.index(item)])
+                element_item.append(self.element[self.index.index(item)])
             else:
                 raise IndexError("list index out of range")
-        return _element_item
+        return element_item
 
-    def _public(self, other):
+    def public(self, other):
         public_index = list()
         for index in self.index:
             if index in other.index:
                 public_index.append(index)
-        self_element = self.array()[public_index[0]:public_index[-1]+1]
-        other_element = other.array()[public_index[0]:public_index[-1]+1]
+        self_element = self.array()[public_index[0]:public_index[-1] + 1]
+        other_element = other.array()[public_index[0]:public_index[-1] + 1]
         return SignalArray(public_index, self_element), SignalArray(public_index, other_element)
 
     def __getitem__(self, item):
@@ -32,12 +70,12 @@ class SignalArray(ArrayBase):
         elif type(item) is slice:
             if item.start is not None:
                 if item.stop is not None:
-                    return self._getitem(item.start, item.stop)
+                    return self._getitem_(item.start, item.stop)
                 else:
-                    return self._getitem(item.start, self.index[-1]+1)
+                    return self._getitem_(item.start, self.index[-1] + 1)
             else:
                 if item.stop is not None:
-                    return self._getitem(self.index[0], item.stop)
+                    return self._getitem_(self.index[0], item.stop)
                 else:
                     return self.element
 
@@ -76,7 +114,7 @@ class SignalArray(ArrayBase):
 
     def __add__(self, other):
         if type(other) is SignalArray:
-            _self, _other = self._public(other)
+            _self, _other = self.public(other)
             element = [_self[i] + _other[i] for i in _self.index]
             return SignalArray([_self.index, element])
         elif type(other) is int or type(other) is float or type(other) is complex:
@@ -85,9 +123,20 @@ class SignalArray(ArrayBase):
         else:
             raise TypeError("supported operand type(s) for +: 'int', 'float', 'complex' and 'SignalArray'")
 
+    def __sub__(self, other):
+        if type(other) is SignalArray:
+            _self, _other = self.public(other)
+            element = [_self[i] - _other[i] for i in _self.index]
+            return SignalArray([_self.index, element])
+        elif type(other) is int or type(other) is float or type(other) is complex:
+            return SignalArray([self.index,
+                                [self.array()[i] - other for i in self.index]])
+        else:
+            raise TypeError("supported operand type(s) for -: 'int', 'float', 'complex' and 'SignalArray'")
+
     def __mul__(self, other):
         if type(other) is SignalArray:
-            _self, _other = self._public(other)
+            _self, _other = self.public(other)
             element = [_self[i] * _other[i] for i in _self.index]
             return SignalArray([_self.index, element])
         elif type(other) is int or type(other) is float:
@@ -98,7 +147,7 @@ class SignalArray(ArrayBase):
 
     def __pow__(self, power, modulo=None):
         if type(power) is SignalArray:
-            _self, _other = self._public(power)
+            _self, _other = self.public(power)
             element = [_self[i] ** _other[i] for i in _self.index]
             return SignalArray([_self.index, element])
         elif type(power) is int or type(power) is float:
@@ -106,6 +155,13 @@ class SignalArray(ArrayBase):
                                 [self.array()[i] ** power for i in self.index]])
         else:
             raise TypeError("supported operand type(s) for **: 'int', 'float', and 'SignalArray'")
+
+    def __abs__(self):
+        if type(self.element[0]) in [complex, np.complex128, np.complex64]:
+            return SignalArray([self.index,
+                                [np.sqrt(self.element[i].real ** 2 + self.element[i].imag ** 2) for i in self.index]])
+        else:
+            return self.array()
 
     def reverse(self):
         index = range(-self.index[-1], -self.index[0] + 1)

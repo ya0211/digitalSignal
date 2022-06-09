@@ -1,4 +1,5 @@
-from ._array_utils import SignalElement, SignalIndex
+from .signal_element import SignalElement
+from .signal_index import SignalIndex
 from .signal_array import SignalArray
 from .periodic_extend import expand, expand2r, array2t0
 

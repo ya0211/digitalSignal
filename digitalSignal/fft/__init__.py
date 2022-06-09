@@ -1,5 +1,4 @@
-from ._dft import DFT
+from .dft import dft
+from .fft import fft, fft1
 
-dft = DFT()
-
-__all__ = ["dft", "DFT"]
+__all__ = ["dft", "fft", "fft1"]
