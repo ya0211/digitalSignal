@@ -17,7 +17,7 @@ class SignalArray:
             if len(index) != len(element):
                 raise ValueError(
                     "the length index is {0}, but element's is {1}".format(len(index), len(element)))
-        self.index = SignalIndex([int(i) for i in index])
+        self.index = SignalIndex(index)
         self.element = SignalElement(element)
         self._item_next = None
 
@@ -44,13 +44,14 @@ class SignalArray:
         return "darray({0}, {1})".format(_self.index, eq)
 
     def _getitem_(self, start, stop):
+        index_item = range(start, stop)
         element_item = list()
-        for item in range(start, stop):
+        for item in index_item:
             if item in self.index:
                 element_item.append(self.element[self.index.index(item)])
             else:
                 raise IndexError("list index out of range")
-        return element_item
+        return SignalArray([index_item, element_item])
 
     def public(self, other):
         public_index = list()
@@ -77,7 +78,7 @@ class SignalArray:
                 if item.stop is not None:
                     return self._getitem_(self.index[0], item.stop)
                 else:
-                    return self.element
+                    return self.array()
 
     def __setitem__(self, key, value):
         if type(key) is slice:
@@ -90,7 +91,7 @@ class SignalArray:
             else:
                 stop = key.stop
             if type(value) is list:
-                value = [float(i) for i in value]
+                value = [i for i in value]
                 if len(self.array()[key]) == len(value):
                     stop = self.index.index(stop)
                     if key.stop is None:
@@ -99,10 +100,8 @@ class SignalArray:
                 else:
                     raise IndexError("list index out of range")
             else:
-                raise IndexError("list index out of range")
+                raise TypeError("unsupported operand type(s): {0}".format(type(value)))
         elif type(key) is int:
-            if type(value) is int:
-                value = float(value)
             self.element[self.index.index(key)] = value
 
     def __next__(self):
