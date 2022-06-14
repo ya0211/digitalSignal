@@ -1,11 +1,14 @@
-from .dft import init as _init
-from .dft import w, dft
-from .container import Container
-from digitalSignal.array import SignalArray
+from typing import Optional
+
 from scipy.fft import fft as _fft
 
+from digitalSignal.array import SignalArray
+from ._container import Container
+from ._dft import init as _init
+from ._dft import w, dft
 
-def init(a: SignalArray, n=None):
+
+def init(a: SignalArray, n: Optional[int] = None) -> Container:
     _self = _init(a, n)
     self = Container(a=_self.a,
                      n=_self.n,
@@ -28,16 +31,14 @@ def init(a: SignalArray, n=None):
     return self.args()
 
 
-def fft1(a: SignalArray, n=None):
+def fft1(a: SignalArray, n: Optional[int] = None) -> SignalArray:
     self = init(a, n)
-    element = [self.x1[k] +
-               w(self, k=k) * self.x2[k] for k in self.index] + [
-                  self.x1[k] -
-                  w(self, k=k) * self.x2[k] for k in self.index]
+    element = [self.x1[k] + w(self, k=k) * self.x2[k] for k in self.index] + [
+                  self.x1[k] - w(self, k=k) * self.x2[k] for k in self.index]
     return SignalArray(range(0, self.n), element)
 
 
-def fft(a: SignalArray, n=None):
+def fft(a: SignalArray, n: Optional[int] = None) -> SignalArray:
     self = _init(a, n)
     element = _fft(self.element)
     return SignalArray([self.index, element])

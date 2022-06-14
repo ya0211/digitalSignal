@@ -7,7 +7,7 @@ def draw(a: list, text: list, xlabel=None, ylabel=None, xlim=None, ylim=None,
          fig_size=(12, 9), style="plot", grid=None, file_name="figure.pdf"):
 
     plt.figure(figsize=fig_size)
-    plt.subplots_adjust(hspace=0.5)
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)
 
     def draw_fun(data: SignalArray, draw_style):
         if draw_style == "stem":
