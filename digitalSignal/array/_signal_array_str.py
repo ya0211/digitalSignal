@@ -32,7 +32,6 @@ def _array_str(a: SignalArray) -> str:
             _str_element += "{:08f}".format(_item).rjust(15, " ")
         elif type(item) in [int, int_]:
             _str_element += " {}".format(item).rjust(len(str(a.element.max()))+1, " ")
-    if _str_array == _str_index:
-        _str_array += " [{}]".format(_str_element)
+    _str_array += "\n{}".format(_str_element)
     return _str_array
 

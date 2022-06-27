@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from digitalSignal import SignalArray
+from ..array import SignalArray
 
 
 def draw(a: list, text: list, xlabel=None, ylabel=None, xlim=None, ylim=None,

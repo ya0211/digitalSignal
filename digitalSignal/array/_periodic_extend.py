@@ -5,9 +5,9 @@ import numpy as np
 from ._signal_array import SignalArray
 
 
-def expand(a: SignalArray, n: int, t: Optional[int] = 3) -> SignalArray:
+def expand(a: SignalArray, n: int, t: Optional[int] = 1) -> SignalArray:
     if a.index.start != 0:
-        a = array2t0(a)
+        a = getT(a)
     if n < np.ceil(len(a) / 2):
         raise ValueError(
             "the n={0} is too small, n≥{1}".format(n, int(np.ceil(len(a) / 2))))
@@ -25,11 +25,7 @@ def expand(a: SignalArray, n: int, t: Optional[int] = 3) -> SignalArray:
         return SignalArray(index, element)
 
 
-def expand2r(a: SignalArray, n: int) -> SignalArray:
-    return expand(a, n, t=1)
-
-
-def array2t0(a: SignalArray) -> SignalArray:
+def getT(a: SignalArray) -> SignalArray:
     index = a.index
     element = a.element
     t = len(a)

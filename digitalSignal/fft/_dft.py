@@ -3,7 +3,7 @@ from typing import Union, Optional
 import numpy as np
 from numpy import complex_
 
-from digitalSignal.array import SignalArray, SignalElement, SignalIndex, array2t0
+from ..array import SignalArray, SignalElement, SignalIndex, getT
 from ._container import Container
 
 
@@ -11,7 +11,7 @@ def init(a: SignalArray, n: Optional[int] = None) -> Container:
 
     self = Container(a=None, element=None, index=None, n=None)
     if a.index.start() != 0:
-        a = array2t0(a)
+        a = getT(a)
     self.a = a
     self.element = a.element
     self.index = a.index

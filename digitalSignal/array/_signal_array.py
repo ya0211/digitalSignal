@@ -1,9 +1,9 @@
 import numpy as np
 from numpy import int_, float_, complex_
 
+from ._signal_array_str import _array_str
 from ._signal_element import SignalElement
 from ._signal_index import SignalIndex
-from ._signal_array_str import _array_str
 
 
 class SignalArray:
@@ -175,8 +175,8 @@ class SignalArray:
         element = [self.element[i] for i in range(-1, -len(self.element) - 1, -1)]
         return SignalArray(index, element)
 
-    def shift(self, n: int):
-        index = range(self.index[0] - n, self.index[-1] + 1 - n)
+    def shift(self, m):
+        index = range(self.index[0] - m, self.index[-1] + 1 - m)
         element = self.element
         return SignalArray(index, element)
 

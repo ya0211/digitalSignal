@@ -1,8 +1,8 @@
-from digitalSignal.array import *
-from digitalSignal.fft import *
+from .array import *
+from .fft import *
 
 darray = SignalArray
 
 __all__ = ["darray", "SignalArray", "SignalElement", "SignalIndex"]
-__all__ += ["expand", "expand2r", "array2t0"]
-__all__ += ["dft", "fft", "fft1"]
+__all__ += ["expand", "getT"]
+__all__ += ["dft", "fft", "fft_"]

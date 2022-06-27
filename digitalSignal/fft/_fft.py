@@ -2,7 +2,7 @@ from typing import Optional
 
 from scipy.fft import fft as _fft
 
-from digitalSignal.array import SignalArray
+from ..array import SignalArray
 from ._container import Container
 from ._dft import init as _init
 from ._dft import w, dft
@@ -25,13 +25,13 @@ def init(a: SignalArray, n: Optional[int] = None) -> Container:
         self.x1 = dft(self.a1)
         self.x2 = dft(self.a2)
     else:
-        self.x1 = fft1(self.a1)
-        self.x2 = fft1(self.a2)
+        self.x1 = fft_(self.a1)
+        self.x2 = fft_(self.a2)
 
     return self.args()
 
 
-def fft1(a: SignalArray, n: Optional[int] = None) -> SignalArray:
+def fft_(a: SignalArray, n: Optional[int] = None) -> SignalArray:
     self = init(a, n)
     element = [self.x1[k] + w(self, k=k) * self.x2[k] for k in self.index] + [
                   self.x1[k] - w(self, k=k) * self.x2[k] for k in self.index]
